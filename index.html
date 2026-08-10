@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>um mês 💗</title>
+<meta name="description" content="uma coisa que eu fiz pra você 💗">
+<meta property="og:title" content="um mês 💗">
+<meta property="og:description" content="abre com calma, tem coisa escondida 💌">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💗%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   PALETA E TOKENS
+   ============================================================ */
+:root{
+  --papel:   #fff1f3;   /* base: papel rosado (não creme) */
+  --blush:   #ffd9e0;   /* lavagens suaves */
+  --rosa:    #ff5c8a;   /* acento vivo */
+  --cereja:  #d4123f;   /* a tinta: linha, datas, números */
+  --tinta:   #4a0d1c;   /* texto corrido (contraste ~13:1) */
+  --branco:  #ffffff;   /* moldura das polaroids */
+
+  --serif:  ui-serif, 'New York', Georgia, 'Times New Roman', serif;
+  --sans:   system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mao:    'Snell Roundhand', 'Apple Chancery', 'Segoe Script', 'Bradley Hand', cursive;
+
+  --sombra-pol: 0 1px 2px rgba(74,13,28,.10), 0 10px 24px rgba(74,13,28,.14), 0 24px 48px rgba(212,18,63,.08);
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+/* rede de segurança: polaroids tortas e a escondida que espia podem passar
+   da borda em telas estreitas — nunca deve virar scroll lateral */
+html,body{ overflow-x:hidden; }
+body{
+  margin:0; color:var(--tinta); font-family:var(--sans);
+  font-size:clamp(15px,1.05rem,17px); line-height:1.65;
+  background:
+    radial-gradient(900px 700px at 12% 4%,  rgba(255,92,138,.16), transparent 62%),
+    radial-gradient(760px 620px at 92% 26%, rgba(212,18,63,.10),  transparent 60%),
+    radial-gradient(820px 700px at 50% 96%, rgba(255,217,224,.55), transparent 66%),
+    var(--papel);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* grão de filme: faz a página inteira parecer uma fotografia */
+.grao{
+  position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.30;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   TIPOGRAFIA
+   ============================================================ */
+h1,h2{ font-family:var(--serif); font-weight:600; letter-spacing:-.015em; margin:0; }
+.olho{ /* eyebrow: datas e rótulos — versalete largo, "isto é um registro" */
+  font-family:var(--sans); font-size:11.5px; font-weight:700;
+  letter-spacing:.20em; text-transform:uppercase; color:var(--cereja);
+  margin:0 0 10px;
+}
+/* Rótulo de duas linhas, quebrado de propósito em vez de deixar o navegador
+   quebrar onde calhar: a DATA em cima, em cereja, e o DIA DA SEMANA embaixo,
+   mais claro. O dia da semana importa aqui — o mês foi de sexta a segunda. */
+.olho .ord, .olho .dias{ display:block; }
+.olho .dias{ color:#a8546b; margin-top:3px; }
+.mao{ font-family:var(--mao); font-weight:400; }
+
+button{ font:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+:focus-visible{ outline:3px solid var(--rosa); outline-offset:3px; border-radius:4px; }
+
+/* ============================================================
+   PORTÃO — uma polaroid em branco que revela ao acertar a data
+   ============================================================ */
+#portao{
+  position:fixed; inset:0; z-index:50; display:grid; place-items:center;
+  padding:24px; background:inherit;
+  transition:opacity .7s ease, transform .7s ease;
+}
+#portao.saindo{ opacity:0; transform:scale(1.06); pointer-events:none; }
+
+.portao-in{ text-align:center; max-width:340px; width:100%; }
+
+/* a polaroid do portão */
+.pol-portao{
+  background:var(--branco); padding:14px 14px 0; border-radius:3px;
+  box-shadow:var(--sombra-pol); transform:rotate(-1.5deg);
+  margin:0 auto 26px; width:min(300px,84vw);
+}
+.pol-portao .janela{
+  position:relative; aspect-ratio:1/1; background:#f2e7ea; overflow:hidden;
+  display:grid; place-items:center;
+}
+/* a "emulsão" que some quando revela */
+.pol-portao .janela::after{
+  content:''; position:absolute; inset:0; background:#efe2e6;
+  transition:opacity 2.4s ease;
+}
+.pol-portao.revelada .janela::after{ opacity:0; }
+.pol-portao .janela .marca{
+  font-family:var(--mao); font-size:64px; color:#b08a95;
+  position:relative; z-index:2; transition:opacity .8s ease;
+}
+.pol-portao.revelada .janela .marca{ opacity:0; }
+.pol-portao .janela img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  opacity:0; transition:opacity 2.4s ease; z-index:1;
+}
+.pol-portao.revelada .janela img{ opacity:1; }
+.pol-portao .legenda{
+  font-family:var(--mao); font-size:23px; color:var(--tinta);
+  padding:14px 4px 18px; min-height:62px; display:grid; place-items:center;
+}
+
+#dataInput{
+  font-family:var(--mao); font-size:26px; color:var(--cereja);
+  text-align:center; width:100%; background:transparent;
+  border:none; border-bottom:2px solid var(--blush); padding:2px 0 4px;
+  transition:border-color .2s;
+}
+#dataInput::placeholder{ color:#d9bfc6; }
+#dataInput:focus{ outline:none; border-bottom-color:var(--rosa); }
+
+.pergunta{ font-family:var(--serif); font-size:clamp(19px,4.6vw,23px); line-height:1.4; margin:0 0 22px; }
+.entrar{
+  background:var(--cereja); color:#fff; font-weight:700; font-size:16px;
+  padding:14px 38px; border-radius:999px; letter-spacing:.02em;
+  box-shadow:0 8px 20px rgba(212,18,63,.32);
+  transition:transform .18s, box-shadow .2s;
+}
+.entrar:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(212,18,63,.42); }
+.entrar:active{ transform:translateY(0); }
+.dica{ font-size:13.5px; color:var(--cereja); min-height:20px; margin:16px 0 0; opacity:0; transition:opacity .3s; }
+.dica.on{ opacity:1; }
+.tremer{ animation:tremer .42s ease; }
+@keyframes tremer{ 0%,100%{transform:translateX(0) rotate(-1.5deg)} 20%{transform:translateX(-9px) rotate(-3deg)} 40%{transform:translateX(8px) rotate(0deg)} 60%{transform:translateX(-6px) rotate(-3deg)} 80%{transform:translateX(4px) rotate(-1deg)} }
+
+/* ============================================================
+   PÁGINA
+   ============================================================ */
+#pagina{ opacity:0; transition:opacity .9s ease .2s; }
+#pagina.on{ opacity:1; }
+
+.capa{ text-align:center; padding:clamp(64px,16vh,140px) 24px clamp(40px,8vh,72px); }
+.capa h1{
+  font-size:clamp(52px,17vw,120px); line-height:.92; color:var(--cereja);
+  letter-spacing:-.04em;
+}
+.capa h1 em{ font-style:italic; display:block; font-size:.44em; color:var(--tinta); letter-spacing:-.02em; margin-top:6px; }
+.capa .sub{ font-family:var(--serif); font-size:clamp(17px,4.4vw,21px); margin:22px auto 0; max-width:30ch; color:var(--tinta); }
+.rolar{ margin-top:38px; font-size:11.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--cereja); opacity:.75; }
+.rolar span{ display:block; font-size:20px; letter-spacing:0; margin-top:4px; animation:respirar 2.4s ease-in-out infinite; }
+@keyframes respirar{ 0%,100%{transform:translateY(0);opacity:.5} 50%{transform:translateY(6px);opacity:1} }
+
+/* ============================================================
+   A LINHA — tinta desenhada à mão, costurando o mês
+   ============================================================ */
+.linha{ position:relative; padding:0 18px 40px; max-width:880px; margin:0 auto; }
+.trilho{
+  position:absolute; top:0; bottom:0; left:10px; width:44px;
+  pointer-events:none; z-index:0;
+}
+.trilho svg{ width:100%; height:100%; display:block; }
+/* O viewBox é reescrito por JS pra bater 1:1 com o tamanho real em pixels, e a
+   curva é gerada nessas mesmas coordenadas. Sem esticamento: a espessura não
+   distorce, as ondas têm sempre o mesmo tamanho, e — o que importa de verdade —
+   stroke-dasharray passa a falar a mesma língua que getTotalLength(). */
+.trilho path{ fill:none; stroke:var(--cereja); stroke-linecap:round; }
+.trilho .risco{ stroke-width:2.5; opacity:.5; }
+.trilho .ponta{ stroke-width:9; opacity:0; transition:opacity .3s; }
+
+/* ============================================================
+   MOMENTOS
+   ============================================================ */
+.momento{
+  position:relative; z-index:1; padding-left:52px; margin:0 0 clamp(56px,11vh,96px);
+  opacity:0; transform:translateY(28px);
+  transition:opacity .8s cubic-bezier(.2,.7,.3,1), transform .8s cubic-bezier(.2,.7,.3,1);
+}
+.momento.vis{ opacity:1; transform:none; }
+.momento:last-child{ margin-bottom:26px; }   /* a linha termina junto do conteúdo */
+.momento h2{ font-size:clamp(23px,5.6vw,30px); line-height:1.2; margin:0 0 10px; }
+.momento p{ margin:0 0 20px; max-width:34ch; }
+
+/* ============================================================
+   POLAROID
+   ============================================================ */
+.pol{
+  position:relative; width:min(280px,69vw); perspective:1200px;
+  transform:rotate(var(--tilt,-2deg));
+  transition:transform .3s cubic-bezier(.2,.7,.3,1);
+  cursor:pointer; border-radius:3px;
+}
+.pol:hover,.pol:focus-visible{ transform:rotate(0deg) translateY(-7px); }
+.pol-in{
+  position:relative; transform-style:preserve-3d;
+  transition:transform .72s cubic-bezier(.3,.9,.3,1);
+}
+.pol.virada .pol-in{ transform:rotateY(180deg); }
+.pol-face{
+  position:relative;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--branco); padding:13px 13px 0; border-radius:3px;
+  box-shadow:var(--sombra-pol);
+}
+.pol-verso{ position:absolute; inset:0; transform:rotateY(180deg); display:flex; flex-direction:column; justify-content:center; padding:22px 20px 34px; }
+/* a data no pé do verso, como no verso de uma foto revelada de verdade */
+.pol-verso .quando{
+  position:absolute; left:0; right:0; bottom:15px; text-align:center;
+  font-family:var(--sans); font-size:9.5px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:#dcc0c8; margin:0;
+}
+.pol .janela{ aspect-ratio:1/1; background:#f4e9ec; overflow:hidden; display:grid; place-items:center; position:relative; }
+.pol .janela img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pol .vazia{ font-family:var(--mao); font-size:15px; color:#c9b3ba; text-align:center; padding:0 18px; line-height:1.4; }
+/* Fim de semana sem foto: a moldura fica em branco DE PROPÓSITO, com uma frase
+   dentro. Uma polaroid vazia com texto lê como escolha; sem texto, lê como erro. */
+.pol .janela.revelando{ background:#f0e3e7; }
+.pol .janela.revelando .vazia{
+  font-size:clamp(16px,4vw,18px); color:#b08a95; line-height:1.5;
+}
+.pol .cap{ font-family:var(--mao); font-size:20px; color:var(--tinta); text-align:center; padding:12px 6px 16px; margin:0; }
+.pol .recado{ font-family:var(--mao); font-size:clamp(19px,4.8vw,23px); line-height:1.45; color:var(--cereja); text-align:center; margin:0; }
+.pol .virar{
+  position:absolute; right:10px; bottom:11px; font-size:9px; letter-spacing:.16em;
+  text-transform:uppercase; color:#d8bcc4; pointer-events:none;
+  transition:color .25s;
+}
+.pol:hover .virar{ color:var(--rosa); }
+
+/* pilha: um marco pode ter várias fotos. Empilhadas com deslocamento alternado,
+   como um monte de fotos reveladas espalhadas na mesa. */
+.pilha{ display:flex; flex-direction:column; gap:18px; align-items:flex-start; }
+.pilha > *:nth-child(even){ margin-left:26px; }
+.contagem{
+  font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:#c99aa8; margin:0 0 12px;
+}
+
+/* easter egg A — a polaroid escondida espiando por trás */
+.esconderijo{ position:relative; width:min(280px,69vw); }
+.espia{
+  position:absolute; top:18px; left:0; width:100%; z-index:-1;
+  transform:rotate(7deg) translateX(20px);
+  transition:transform .7s cubic-bezier(.2,1.2,.35,1);
+}
+.espia.fora{ position:static; transform:rotate(-2deg); margin-top:22px; }
+.espia .pol{ width:100%; }
+
+/* ============================================================
+   FIM — o contador dentro de uma frase, não num painel
+   ============================================================ */
+.fim{ text-align:center; padding:clamp(48px,10vh,80px) 24px clamp(70px,14vh,120px); max-width:640px; margin:0 auto; }
+.fim .frase{ font-family:var(--serif); font-size:clamp(21px,5.4vw,29px); line-height:1.45; margin:0 0 30px; }
+.fim .frase b{ color:var(--cereja); font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.assina{ font-family:var(--mao); font-size:clamp(27px,7vw,36px); color:var(--cereja); margin:36px 0 0; }
+.reler{ display:inline-block; margin-top:30px; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--cereja); opacity:.7; text-decoration:underline; text-underline-offset:4px; }
+.reler:hover{ opacity:1; }
+
+.rodape{ text-align:center; padding:0 24px 46px; }
+/* No celular este coração é o ÚNICO caminho pro segredo (não há teclado solto
+   pra digitar a palavra), então ele é grande e o campo já vem aberto. */
+.segredo{ font-size:44px; opacity:.75; padding:10px; line-height:1;
+          transition:opacity .25s, transform .25s;
+          animation:pulsinho 4s ease-in-out infinite; }
+.segredo:hover{ opacity:1; transform:scale(1.12); }
+@keyframes pulsinho{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.09) } }
+#campoSegredo{
+  display:block; margin:12px auto 0; max-width:280px;
+  font-family:var(--mao); font-size:20px; color:var(--cereja); text-align:center; width:100%;
+  background:transparent; border:none; border-bottom:2px solid var(--blush); padding:4px 0;
+}
+#campoSegredo:focus{ outline:none; border-bottom-color:var(--rosa); }
+#campoSegredo.on{ display:block; }
+.sussurro{ font-size:13px; color:var(--tinta); opacity:.65; margin:14px auto 0; max-width:28ch; display:block; }
+.sussurro.on{ display:block; }
+
+/* ============================================================
+   MUDO + CARD DO SEGREDO
+   ============================================================ */
+#mudo{
+  position:fixed; top:14px; right:14px; z-index:55; width:44px; height:44px;
+  border-radius:50%; background:rgba(255,255,255,.78); color:var(--cereja);
+  font-size:17px; box-shadow:0 3px 12px rgba(74,13,28,.16); display:none; place-items:center;
+}
+#mudo.on{ display:grid; }
+
+#cardSegredo{
+  position:fixed; inset:0; z-index:58; display:none; place-items:center; padding:26px;
+  background:rgba(74,13,28,.30); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+}
+#cardSegredo.on{ display:grid; }
+#cardSegredo .hf{ display:flex; flex-direction:column; align-items:center; }
+/* o card é um coração de verdade: SVG como fundo, texto no miolo. O padding
+   generoso embaixo é o que impede o texto de cair na ponta que afina. */
+#cardSegredo .caixa{
+  width:min(430px, 93vw); aspect-ratio:1/1;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb3c2'/%3E%3Cstop offset='1' stop-color='%23ff7189'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23g)' d='M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z'/%3E%3C/svg%3E") center/contain no-repeat;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:15% 19% 30%; text-align:center;
+  filter:drop-shadow(0 18px 42px rgba(212,18,63,.42));
+  animation:surgir .6s cubic-bezier(.2,1.4,.4,1) both, bater 2.6s ease-in-out .7s infinite;
+}
+@keyframes surgir{ from{transform:scale(.35) rotate(-6deg);opacity:0} to{transform:none;opacity:1} }
+@keyframes bater{ 0%,100%{transform:scale(1)} 10%{transform:scale(1.035)} 20%{transform:scale(1)} 30%{transform:scale(1.02)} 42%{transform:scale(1)} }
+/* sobre o coração o texto é bordô escuro: branco em vermelho claro dá 2,7:1 e reprova */
+#cardSegredo .aspas{ font-family:var(--mao); font-size:clamp(21px,5.6vw,27px); color:#7d0f2a; margin:0 0 9px; line-height:1.15; }
+#cardSegredo p{ margin:0 0 8px; font-size:clamp(11.5px,3.1vw,13.5px); line-height:1.38; color:var(--tinta); }
+#cardSegredo .destaque{
+  font-family:var(--serif); font-size:clamp(13px,3.5vw,15.5px); line-height:1.32;
+  color:#7d0f2a; margin:10px 0 0; font-weight:600;
+}
+#cardSegredo .fechar{ margin-top:18px; font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+  color:#fff; opacity:.85; text-decoration:underline; text-underline-offset:4px; }
+
+/* ============================================================
+   DESKTOP — a linha vai pro centro e os momentos alternam
+   ============================================================ */
+@media (min-width:900px){
+  .trilho{ left:50%; margin-left:-22px; }
+  .momento{ width:calc(50% - 46px); padding-left:0; }
+  .momento:nth-child(odd){ margin-right:auto; text-align:right; }
+  .momento:nth-child(odd) p{ margin-left:auto; }
+  /* no lado esquerdo da linha a pilha encosta à direita, e o desvio inverte */
+  .momento:nth-child(odd) .pilha{ align-items:flex-end; }
+  .momento:nth-child(odd) .pilha > *:nth-child(even){ margin-left:0; margin-right:26px; }
+  .momento:nth-child(even){ margin-left:auto; }
+  .momento:nth-child(even){ transform:translateY(28px) translateX(14px); }
+  .momento:nth-child(odd){ transform:translateY(28px) translateX(-14px); }
+  .momento.vis{ transform:none; }
+  .momento{ margin-bottom:clamp(40px,7vh,68px); }
+  /* como os marcos alternam de lado, eles podem subir e se entrelaçar sem
+     colidir — é o que tira o vazio enorme de um lado da linha */
+  .momento + .momento{ margin-top:-150px; }
+  .pol{ width:330px; }
+  .esconderijo{ width:330px; }
+  .momento p{ max-width:38ch; }
+}
+
+/* ============================================================
+   ACESSIBILIDADE
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation:none !important; transition-duration:.01ms !important; }
+  .momento{ opacity:1 !important; transform:none !important; }
+  #cardSegredo .caixa{ animation:none !important; }
+  .trilho path{ stroke-dashoffset:0 !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="grao" aria-hidden="true"></div>
+<audio id="musica" loop preload="auto"></audio>
+<button id="mudo" onclick="alternarMudo()" aria-label="Ligar ou desligar a música">🔊</button>
+
+<!-- ============ PORTÃO ============ -->
+<section id="portao">
+  <div class="portao-in">
+    <p class="olho">para entrar</p>
+    <p class="pergunta">quando foi que eu te vi<br>pela primeira vez?</p>
+
+    <div class="pol-portao" id="polPortao">
+      <div class="janela">
+        <span class="marca">?</span>
+        <img id="fotoPortao" alt="">
+      </div>
+      <div class="legenda">
+        <input id="dataInput" inputmode="numeric" autocomplete="off"
+               placeholder="__ / __" aria-label="A data do nosso primeiro encontro">
+      </div>
+    </div>
+
+    <button class="entrar" onclick="tentar()">revelar</button>
+    <p class="dica" id="dica" role="status"></p>
+  </div>
+</section>
+
+<!-- ============ PÁGINA ============ -->
+<main id="pagina" aria-hidden="true">
+
+  <header class="capa">
+    <p class="olho" id="periodo"></p>
+    <h1>um mês<em>de nós</em></h1>
+    <p class="sub" id="subtitulo"></p>
+    <p class="rolar">role<span>↓</span></p>
+  </header>
+
+  <section class="linha" id="linha">
+    <div class="trilho" aria-hidden="true">
+      <svg id="svgTrilho" preserveAspectRatio="none">
+        <path id="tinta" class="risco"></path>
+        <path id="ponta" class="ponta"></path>
+      </svg>
+    </div>
+    <div id="momentos"></div>
+  </section>
+
+  <section class="fim">
+    <p class="olho">agora mesmo</p>
+    <p class="frase" id="contador">faz <b>—</b> que eu tô contando.</p>
+    <p class="assina" id="assinatura">— do seu Gu</p>
+    <a class="reler" href="#" onclick="window.scrollTo({top:0});return false;">ler de novo</a>
+  </section>
+
+  <footer class="rodape">
+    <button class="segredo" id="btnSegredo" onclick="abrirCampo()" aria-label="Escrever a palavra secreta">💗</button>
+    <p class="sussurro" id="sussurro">se você lembra do que você falou lá no começo…</p>
+    <input id="campoSegredo" autocomplete="off" placeholder="escreve aqui…"
+           aria-label="Palavra secreta">
+  </footer>
+</main>
+
+<!-- ============ CARD DO SEGREDO ============ -->
+<div id="cardSegredo" onclick="fecharSegredo(event)">
+  <div class="hf">
+    <div class="caixa">
+      <div id="segredoTexto"><!-- preenchido ao decifrar o conteúdo --></div>
+    </div>
+    <button class="fechar" onclick="fecharSegredo()">fechar</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. CONFIG — mexa só aqui pra trocar datas, música e assinatura
+   ============================================================ */
+const CONFIG = {
+  // A data NÃO fica aqui: ela é a chave que decifra as fotos. Guardá-la no
+  // código seria trancar a porta e pendurar a chave na maçaneta.
+  // `inicio` (o marco zero do contador) também é a data-chave, então vem
+  // cifrado junto com o conteúdo — não pode morar aqui.
+  assinatura:       'Gu',
+  fotoPortao:       'fotos/neon-2.enc',    // a foto que "revela" ao acertar
+  // "Dani" — Biquini Cavadão. Se você largar um mp3 em fotos/dani.mp3 ele tem
+  // prioridade (toca offline); sem ele, cai no YouTube escondido.
+  musica:           'fotos/dani.mp3',
+  youtubeIds:       ['lEIc002oJ0s','eRvi1nAPoOI','55lGfJdX9HI','ZLppReXhxyQ'],
+  musicaInicio:     32,                 // o segundo do refrão ("só penso nela…")
+  // Criptografia das fotos (AES-256-GCM, chave derivada da data por PBKDF2).
+  // Gerado por scripts/cifrar.js — regenerar exige refazer os .enc junto.
+  versao:       4,   // suba isto ao regravar conteudo.enc: fura o cache da CDN
+  salt:         '77220828ef3cdba5b1ad949b28bb8973',
+  iteracoes:    100000,
+  canario:      'ef9bd85d774810de82fb6aae4b0d8dffcfda4151c288d30dbb0cfbf01256cf1a',
+  // `palavraSecreta` vem cifrada junto com o conteúdo: deixá-la aqui
+  // entregaria o easter egg pra qualquer um que abrisse o fonte.
+};
+
+/* ============================================================
+   2. CONTEÚDO — a linha do tempo, os textos e a palavra secreta vivem
+      cifrados em fotos/conteudo.enc. Para editar: decifre, mexa no JSON e
+      cifre de novo com scripts/cifrar.js (que fica FORA do repositório).
+   ============================================================ *//* Os MOMENTOS não moram mais aqui: datas, textos e recadinhos vinham em texto
+   puro no fonte — e a data era justamente a chave das fotos. Agora tudo isso
+   vive cifrado em fotos/conteudo.enc e só é montado depois que ela destrava. */
+
+/* ============================================================
+   3. UTILITÁRIOS
+   ============================================================ */
+const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const r    = (a,b) => a + Math.random()*(b-a);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const $    = s => document.querySelector(s);
+
+/* Explosão de corações — herdada de cartinha.html */
+function corações(cx, cy, n){
+  if (reduzir) return;
+  if (cx == null){ cx = innerWidth/2; cy = innerHeight/2; }
+  n = n || 22;
+  for (let i=0; i<n; i++){
+    const s = document.createElement('span');
+    s.textContent = pick(['💗','❤️','💕','💖','🩷']);
+    s.style.cssText = 'position:fixed;z-index:70;pointer-events:none;left:'+cx+'px;top:'+cy+
+      'px;font-size:'+r(18,40).toFixed(0)+'px;will-change:transform,opacity;';
+    document.body.appendChild(s);
+    const ang = Math.random()*Math.PI*2, d = r(80,230);
+    s.animate([
+      { transform:'translate(-50%,-50%) scale(.3) rotate(0deg)', opacity:1 },
+      { transform:'translate(calc(-50% + '+(Math.cos(ang)*d)+'px), calc(-50% + '+(Math.sin(ang)*d)+
+        'px)) scale(1.5) rotate('+r(-50,50).toFixed(0)+'deg)', opacity:0 }
+    ], { duration:r(900,1350), easing:'cubic-bezier(.15,.7,.3,1)' });
+    setTimeout(()=>s.remove(), 1400);
+  }
+}
+
+/* ============================================================
+   3b. AS FOTOS SÃO CIFRADAS
+   No servidor as fotos são .enc (AES-256-GCM), não JPEG. A chave sai da
+   data que ela digita, via PBKDF2 — então a senha não é decorativa: baixar
+   o arquivo direto pela URL devolve bytes sem sentido.
+   Exige contexto seguro: crypto.subtle não existe em file://, só https/localhost.
+   ============================================================ */
+const hexBytes = h => Uint8Array.from(h.match(/../g).map(b => parseInt(b, 16)));
+
+/* A data chega em mil formatos e cada um daria uma chave diferente. Em vez de
+   adivinhar o "certo", geramos os candidatos plausíveis e deixamos a
+   autenticação do GCM dizer qual é — ela falha em todos, menos no correto. */
+function candidatosDDMM(entrada){
+  const d = (entrada || '').replace(/\D/g, '');
+  const c = new Set();
+  if (d.length >= 4) c.add(d.slice(0,4));            // DDMM · DDMMAAAA
+  if (d.length >= 2) c.add('0'+d[0] + '0'+d[1]);     // D M · D M AA
+  if (d.length >= 3){
+    c.add('0'+d[0] + d.slice(1,3));                  // D MM
+    c.add(d.slice(0,2) + '0'+d[2]);                  // DD M
+  }
+  return [...c].filter(x => x.length === 4);
+}
+
+async function derivarChave(ddmm){
+  const base = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(ddmm), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt:hexBytes(CONFIG.salt), iterations:CONFIG.iteracoes, hash:'SHA-256' },
+    base, { name:'AES-GCM', length:256 }, false, ['decrypt']);
+}
+
+// formato de cada arquivo: [IV 12 bytes][ciphertext][tag 16 bytes]
+const decifrar = (chave, b) =>
+  crypto.subtle.decrypt({ name:'AES-GCM', iv:b.slice(0,12) }, chave, b.slice(12));
+
+let chaveFotos = null;
+
+/* Substitui a antiga comparação de string: a senha certa é a que consegue
+   decifrar o canário. Um blob minúsculo, pra testar sem baixar uma foto. */
+async function destravarComData(entrada){
+  for (const ddmm of candidatosDDMM(entrada)){
+    const k = await derivarChave(ddmm);
+    try { await decifrar(k, hexBytes(CONFIG.canario)); chaveFotos = k; return true; }
+    catch(e){ /* chave errada — o GCM rejeita, é só tentar a próxima */ }
+  }
+  return false;
+}
+
+const cacheFoto = new Map();
+function urlDaFoto(caminho){
+  if (!cacheFoto.has(caminho)) cacheFoto.set(caminho, (async () => {
+    const r = await fetch(caminho);
+    if (!r.ok) throw new Error('404 ' + caminho);
+    const claro = await decifrar(chaveFotos, new Uint8Array(await r.arrayBuffer()));
+    return URL.createObjectURL(new Blob([claro], { type:'image/jpeg' }));
+  })());
+  return cacheFoto.get(caminho);
+}
+
+/* Decifra sob demanda: só quando a polaroid chega perto da tela. Decifrar as
+   11 de uma vez travaria o celular dela por um instante à toa. */
+const obsFoto = new IntersectionObserver(async entradas => {
+  for (const e of entradas){
+    if (!e.isIntersecting || !chaveFotos) continue;
+    obsFoto.unobserve(e.target);
+    const el = e.target, img = el.querySelector('img'), vazia = el.querySelector('.vazia');
+    try {
+      img.src = await urlDaFoto(el.dataset.foto);
+      img.onload = () => { vazia.style.display = 'none'; };
+    } catch(err){ if (img) img.remove(); if (vazia) vazia.textContent = 'essa não abriu'; }
+  }
+}, { rootMargin:'500px' });
+
+/* O conteúdo (datas, textos, recadinhos) vem cifrado junto com as fotos.
+   Sem a chave, o HTML publicado é só a casca — nem a linha do tempo nem o
+   que ele escreveu pra ela ficam legíveis pra quem abrir o código-fonte. */
+async function carregarConteudo(){
+  // a versão na URL faz o cache da CDN (max-age=600) soltar na hora
+  const r = await fetch('fotos/conteudo.enc?v=' + CONFIG.versao);
+  const claro = await decifrar(chaveFotos, new Uint8Array(await r.arrayBuffer()));
+  const dados = JSON.parse(new TextDecoder().decode(claro));
+
+  montarTimeline(dados.momentos);
+  observarMomentos();
+
+  $('#periodo').textContent   = dados.periodo   || '';
+  $('#subtitulo').textContent = dados.subtitulo || '';
+  palavraSecreta = dados.palavraSecreta;
+  inicioMs = new Date(dados.inicio).getTime();
+  tique();
+
+  const sg = dados.segredo;
+  $('#segredoTexto').innerHTML =
+    '<p class="aspas">' + sg.aspas + '</p>' +
+    sg.linhas.map(l => '<p>' + l + '</p>').join('') +
+    '<p class="destaque">' + sg.destaque + '</p>';
+}
+
+const observarFotos = () =>
+  document.querySelectorAll('.pol[data-foto]').forEach(el => obsFoto.observe(el));
+
+/* ============================================================
+   4. PORTÃO — normaliza a data pra qualquer formato passar
+   ============================================================ */
+let erros = 0;
+const DICAS = [
+  'é uma data 😊',
+  'só o dia e o mês já bastam',
+  'aquele dia. você lembra, vai. 💗'
+];
+
+let tentando = false, jaAbriu = false;
+
+/* `silencioso` = tentativa automática enquanto ela digita. Nesse modo o erro
+   NÃO reclama: seria absurdo tremer a polaroid e acusar senha errada só porque
+   ela ainda não terminou de escrever a data. Só o botão e o Enter reclamam. */
+async function tentar(silencioso){
+  if (tentando || jaAbriu) return;
+  const campo = $('#dataInput'), pol = $('#polPortao'), btn = document.querySelector('.entrar');
+
+  tentando = true;
+  let rotulo;
+  if (!silencioso){ btn.disabled = true; rotulo = btn.textContent; btn.textContent = 'abrindo…'; }
+  let ok = false;
+  try { ok = await destravarComData(campo.value); }
+  catch(e){ ok = false; }            // sem crypto.subtle (file://) nada abre
+  if (!silencioso){ btn.disabled = false; btn.textContent = rotulo; }
+  tentando = false;
+
+  if (!ok){
+    if (silencioso) return;               // ela ainda está digitando
+    pol.classList.remove('tremer');
+    void pol.offsetWidth;                 // reinicia a animação
+    pol.classList.add('tremer');
+    const dica = $('#dica');
+    dica.textContent = DICAS[Math.min(erros, DICAS.length-1)];
+    dica.classList.add('on');
+    erros++;
+    campo.select();
+    return;
+  }
+
+  // acertou: agora existe chave, então a foto do portão pode ser decifrada
+  jaAbriu = true;
+  tocarMusica();
+  campo.disabled = true;
+  $('#dica').classList.remove('on');
+  await carregarConteudo();          // monta a linha do tempo a partir do blob cifrado
+  if (CONFIG.fotoPortao){
+    try { $('#fotoPortao').src = await urlDaFoto(CONFIG.fotoPortao); }
+    catch(e){ const f = $('#fotoPortao'); if (f) f.remove(); }
+  }
+  pol.classList.add('revelada');
+  const cx = innerWidth/2, cy = innerHeight*0.42;
+  corações(cx, cy, 34);
+  setTimeout(()=>corações(cx, cy*0.9, 22), 300);
+
+  setTimeout(()=>{
+    $('#portao').classList.add('saindo');
+    const pg = $('#pagina');
+    pg.removeAttribute('aria-hidden');
+    pg.classList.add('on');
+    document.body.style.overflow = '';
+    observarFotos();                       // só agora as fotos podem ser abertas
+    setTimeout(()=>{ $('#portao').style.display='none'; medirTrilho(); }, 750);
+  }, reduzir ? 200 : 1900);
+}
+
+$('#dataInput').addEventListener('keydown', e => { if (e.key === 'Enter') tentar(); });
+
+/* Ela não precisa apertar nada: 1 segundo depois de parar de digitar, a página
+   tenta sozinha. Só entra em ação com dígitos suficientes pra formar dia+mês. */
+let esperandoDigitar = null;
+$('#dataInput').addEventListener('input', () => {
+  clearTimeout(esperandoDigitar);
+  if ($('#dataInput').value.replace(/\D/g,'').length < 2) return;
+  esperandoDigitar = setTimeout(() => tentar(true), 1000);
+});
+
+/* ============================================================
+   5. MONTAGEM DOS MOMENTOS
+   ============================================================ */
+/* Recebe UMA foto: {foto, cap, verso, pos, alt, curto, semFoto}.
+   Um marco pode ter várias — a pilha é montada por quem chama. */
+function polaroid(m, extra){
+  const tilt = r(-3.4, 3.4).toFixed(1) + 'deg';
+  const el = document.createElement('div');
+  el.className = 'pol' + (extra || '');
+  el.style.setProperty('--tilt', tilt);
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.setAttribute('aria-label','Foto: ' + m.cap + '. Ative para ver o recado do verso.');
+
+  const verso = (m.verso || '').replace(/\n/g,'<br>');
+  el.innerHTML =
+    '<div class="pol-in">' +
+      '<div class="pol-face pol-frente">' +
+        '<div class="janela' + (m.semFoto ? ' revelando' : '') + '">' +
+          '<img alt="' + (m.alt || '') + '">' +
+          '<span class="vazia">' + (m.semFoto || 'a foto entra aqui').replace(/\n/g,'<br>') + '</span>' +
+        '</div>' +
+        '<p class="cap">' + m.cap + '</p>' +
+        '<span class="virar">virar</span>' +
+      '</div>' +
+      '<div class="pol-face pol-verso"><p class="recado">' + verso + '</p>' +
+        (m.curto ? '<p class="quando">' + m.curto + '</p>' : '') + '</div>' +
+    '</div>';
+
+  // A foto só aparece se existir. Se não, fica a moldura em branco — parece
+  // intencional, não quebrado. É isso que você vê antes de me mandar as fotos.
+  const img = el.querySelector('img');
+  const vazia = el.querySelector('.vazia');
+  if (m.foto){
+    // a janela é quadrada e a foto é recortada pelo centro. `pos` reenquadra
+    // quando o assunto não está no meio (ex.: retrato com o rosto mais em cima)
+    if (m.pos) img.style.objectPosition = m.pos;
+    // sem `src` aqui: a foto está cifrada. O caminho fica guardado e obsFoto
+    // decifra quando a polaroid chega perto da tela.
+    el.dataset.foto = m.foto;
+    vazia.textContent = 'revelando…';
+  } else {
+    img.remove();
+  }
+
+  const virar = e => {
+    el.dataset.manual = Date.now();   // ela mexeu: o auto-virar recua nesta
+    el.classList.toggle('virada');
+    if (el.classList.contains('virada')){
+      const b = el.getBoundingClientRect();
+      corações(b.left + b.width/2, b.top + b.height/2, 8);
+    }
+    e.preventDefault();
+  };
+  el.addEventListener('click', virar);
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') virar(e); });
+  return el;
+}
+
+function montarTimeline(MOMENTOS){
+  const alvo = $('#momentos');
+  MOMENTOS.forEach(m => {
+  const sec = document.createElement('article');
+  sec.className = 'momento';
+  const [ord, dias] = m.data.split(' · ');
+  const rotulo = dias ? '<span class="ord">' + ord + '</span><span class="dias">' + dias + '</span>'
+                      : ord;
+  sec.innerHTML = '<p class="olho">' + rotulo + '</p>' +
+                  '<h2>' + m.titulo + '</h2>' +
+                  '<p>' + m.texto + '</p>';
+
+  // Um marco pode ter várias fotos. Sem nenhuma, vira uma moldura em branco
+  // com a frase de `semFoto` — ausência tratada como escolha, não como falha.
+  const fotos = (m.fotos && m.fotos.length) ? m.fotos
+                                            : [{ cap:m.cap, verso:m.verso, semFoto:m.semFoto }];
+  if (fotos.length > 1){
+    const n = document.createElement('p');
+    n.className = 'contagem';
+    n.textContent = fotos.length + ' fotos';
+    sec.appendChild(n);
+  }
+
+  const pilha = document.createElement('div');
+  pilha.className = 'pilha';
+
+  fotos.forEach((f, i) => {
+    const dados = Object.assign({ curto:m.curto }, f);
+
+    if (i === 0 && m.escondida){
+      // easter egg A: duas polaroids empilhadas, uma espiando por trás.
+      // A visível vem primeiro no DOM; a escondida fica absoluta atrás dela e,
+      // quando é puxada pra fora, volta pro fluxo — aparecendo logo abaixo.
+      const caixa = document.createElement('div');
+      caixa.className = 'esconderijo';
+      const oculta = document.createElement('div');
+      oculta.className = 'espia';
+      oculta.appendChild(polaroid(Object.assign({ curto:'' }, m.escondida)));
+      caixa.appendChild(polaroid(dados));
+      caixa.appendChild(oculta);
+      // O primeiro clique só puxa ela pra fora — não vira. Virar é o segundo clique.
+      oculta.addEventListener('click', e => {
+        if (oculta.classList.contains('fora')) return;
+        e.stopPropagation();
+        oculta.classList.add('fora');
+        const b = oculta.getBoundingClientRect();
+        corações(b.left + b.width/2, b.top + b.height/2, 26);
+      }, true);
+      pilha.appendChild(caixa);
+    } else {
+      pilha.appendChild(polaroid(dados));
+    }
+  });
+
+  sec.appendChild(pilha);
+  alvo.appendChild(sec);
+  });
+}
+
+/* ============================================================
+   6. REVEAL AO ROLAR — IntersectionObserver (suporte universal)
+   ============================================================ */
+const obs = new IntersectionObserver(entradas => {
+  entradas.forEach(e => { if (e.isIntersecting){ e.target.classList.add('vis'); obs.unobserve(e.target); } });
+}, { threshold:.18, rootMargin:'0px 0px -8% 0px' });
+const observarMomentos = () =>
+  document.querySelectorAll('.momento').forEach(el => obs.observe(el));
+
+/* ============================================================
+   7. A TINTA SE DESENHANDO CONFORME ELA ROLA
+   ============================================================ */
+const svgTrilho = $('#svgTrilho'), path = $('#tinta'), ponta = $('#ponta'), secao = $('#linha');
+let comprimento = 0;
+
+/* Serpentina desenhada nas coordenadas reais em pixels: onda de altura fixa,
+   independente de quantos momentos a página tenha. */
+function curva(w, h){
+  const meio = w/2, amp = Math.min(9, w/2 - 5), onda = 210;
+  let d = 'M' + meio + ',0', y = 0, lado = 1;
+  while (y < h - 1){
+    const fim = Math.min(y + onda, h), dy = fim - y, x = meio + amp*lado;
+    d += ' C' + x + ',' + (y + dy*0.3) + ' ' + x + ',' + (fim - dy*0.3) + ' ' + meio + ',' + fim;
+    y = fim; lado *= -1;
+  }
+  return d;
+}
+
+function medirTrilho(){
+  const cx = $('.trilho').getBoundingClientRect();
+  const w = Math.round(cx.width), h = Math.round(cx.height);
+  if (!w || !h) return;
+  svgTrilho.setAttribute('viewBox', '0 0 ' + w + ' ' + h);   // 1:1 com a tela
+  const d = curva(w, h);
+  path.setAttribute('d', d);
+  ponta.setAttribute('d', d);
+
+  comprimento = path.getTotalLength();
+  path.style.strokeDasharray  = comprimento;
+  path.style.strokeDashoffset = reduzir ? 0 : comprimento;
+  // a ponta é um traço de comprimento ~zero com ponta redonda: vira um pingo
+  // de tinta que desliza pela mesma curva
+  ponta.style.strokeDasharray = '0.01 ' + comprimento;
+  desenhar();
+}
+
+function desenhar(){
+  if (!comprimento || reduzir) return;
+  const cx = secao.getBoundingClientRect();
+  // 0 quando o topo da seção passa do meio da tela; 1 quando o fim passa
+  const bruto = (innerHeight * 0.72 - cx.top) / (cx.height || 1);
+  const p = Math.max(0, Math.min(1, bruto));
+  path.style.strokeDashoffset  = comprimento * (1 - p);
+  ponta.style.strokeDashoffset = -comprimento * p;
+  // no fim a ponta não some: ela para na última curva e vira o ponto final
+  ponta.style.opacity = p > 0.004 ? 1 : 0;
+}
+
+let agendado = false;
+addEventListener('scroll', () => {
+  if (agendado) return;
+  agendado = true;
+  requestAnimationFrame(() => { desenhar(); agendado = false; });
+}, { passive:true });
+addEventListener('resize', medirTrilho);
+// as fotos chegando mudam a altura da seção — remedir quando isso acontecer
+if (window.ResizeObserver) new ResizeObserver(medirTrilho).observe(secao);
+
+/* ============================================================
+   8. CONTADOR AO VIVO — dentro de uma frase, não num painel
+   ============================================================ */
+const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
+
+let inicioMs = null;    // definido ao decifrar o conteúdo
+
+function tique(){
+  if (inicioMs == null) return;
+  const ms = Date.now() - inicioMs;
+  if (isNaN(ms) || ms < 0) return;
+  const seg  = Math.floor(ms/1000);
+  const dias = Math.floor(seg/86400);
+  const hor  = Math.floor(seg%86400/3600);
+  const min  = Math.floor(seg%3600/60);
+  const s    = seg%60;
+  $('#contador').innerHTML =
+    'faz <b>' + plural(dias,'dia','dias') + '</b>, <b>' + plural(hor,'hora','horas') +
+    '</b>, <b>' + plural(min,'minuto','minutos') + '</b> e <b>' + plural(s,'segundo','segundos') +
+    '</b> que eu tô contando.';
+}
+setInterval(tique, 1000);
+$('#assinatura').textContent = '— do seu ' + CONFIG.assinatura;
+
+/* ============================================================
+   9. EASTER EGG B — a palavra secreta
+      Desktop: buffer de teclas. Celular: campo no rodapé (não há teclado solto).
+   ============================================================ */
+let jaAchou = false, palavraSecreta = null;
+
+function revelarSegredo(){
+  if (jaAchou) return;
+  jaAchou = true;
+  $('#cardSegredo').classList.add('on');
+  corações(innerWidth/2, innerHeight/2, 40);
+  setTimeout(()=>corações(innerWidth/2, innerHeight*0.4, 26), 320);
+}
+function fecharSegredo(e){
+  if (e && e.target && e.target.closest('.hf') && !e.target.classList.contains('fechar')) return;
+  $('#cardSegredo').classList.remove('on');
+}
+// o campo já nasce visível; o coração só leva o foco até ele
+function abrirCampo(){ $('#campoSegredo').focus(); }
+$('#campoSegredo').addEventListener('input', e => {
+  if (palavraSecreta && e.target.value.toLowerCase().includes(palavraSecreta)) revelarSegredo();
+});
+
+let buffer = '';
+addEventListener('keydown', e => {
+  if (e.key.length !== 1) return;
+  if (document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+  buffer = (buffer + e.key.toLowerCase()).slice(-24);
+  if (palavraSecreta && buffer.includes(palavraSecreta)) revelarSegredo();
+});
+
+/* ============================================================
+   10. MÚSICA — "Dani" (Biquini Cavadão)
+   Prioridade: mp3 local (toca offline, sem anúncio). Sem ele, cai num player
+   do YouTube escondido — que NÃO funciona em file://, só em localhost/https.
+   O player é CRIADO no carregamento e só recebe "toca" no clique do portão:
+   criá-lo no clique costuma perder o gesto enquanto a API do YouTube carrega,
+   e aí o navegador bloqueia o autoplay.
+   ============================================================ */
+const audio = $('#musica');
+let ytPlayer = null, ytPronto = false, querTocar = false, mudo = false, idxYT = 0;
+
+const mostrarMudo = () => $('#mudo').classList.add('on');
+
+function tocarMusica(){
+  querTocar = true;
+  if (CONFIG.musica){
+    audio.src = CONFIG.musica;
+    audio.play().then(mostrarMudo).catch(tocarYT);   // sem mp3 → YouTube
+  } else {
+    tocarYT();
+  }
+}
+
+function tocarYT(){
+  if (ytPronto && ytPlayer){ ytPlayer.playVideo(); mostrarMudo(); }
+  // se ainda não estiver pronto, o onReady toca sozinho (querTocar já é true)
+}
+
+function caixaYT(){
+  const box = document.createElement('div');
+  box.id = 'yt';
+  box.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;';
+  document.body.appendChild(box);
+}
+
+function prepararYT(){
+  if (!CONFIG.youtubeIds || !CONFIG.youtubeIds.length) return;
+  caixaYT();
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+  window.onYouTubeIframeAPIReady = criarPlayer;
+}
+
+function criarPlayer(){
+  const id = CONFIG.youtubeIds[idxYT];
+  ytPlayer = new YT.Player('yt', {
+    height:'0', width:'0', videoId:id,
+    // loop de um vídeo só exige `playlist` com o próprio id
+    playerVars:{ autoplay:0, controls:0, playsinline:1, rel:0,
+                 start:CONFIG.musicaInicio || 0, loop:1, playlist:id },
+    events:{
+      onReady: ev => { ytPronto = true; if (querTocar){ ev.target.playVideo(); mostrarMudo(); } },
+      // alguns vídeos têm o embed desabilitado — tenta o próximo da lista
+      onError: () => {
+        idxYT++;
+        if (idxYT >= CONFIG.youtubeIds.length) return;
+        ytPronto = false;
+        try { ytPlayer.destroy(); } catch(e){}
+        caixaYT();
+        criarPlayer();
+      }
+    }
+  });
+}
+
+function alternarMudo(){
+  mudo = !mudo;
+  audio.muted = mudo;
+  if (ytPlayer && ytPronto) mudo ? ytPlayer.mute() : ytPlayer.unMute();
+  $('#mudo').textContent = mudo ? '🔇' : '🔊';
+}
+
+/* ============================================================
+   11. ARRANQUE
+   ============================================================ */
+document.body.style.overflow = 'hidden';       // trava o scroll até destravar o portão
+prepararYT();
+$('#dataInput').focus();
+addEventListener('load', medirTrilho);
+medirTrilho();
+
+/* ============================================================
+   12. AS POLAROIDS VIRANDO SOZINHAS
+   Um pulso a cada 5s. Três regras pra não atrapalhar:
+   - só vira as que estão NA TELA (virar fora da vista é desperdício);
+   - se ela virou uma na mão, essa fica quieta por 15s — a automação nunca
+     deve tirar da tela justamente o que ela parou pra ler;
+   - a polaroid escondida só entra depois de descoberta, pra não se entregar.
+   ============================================================ */
+const AUTO_MS = 5000, RESPEITO_MS = 15000;
+
+function naTela(el){
+  const r = el.getBoundingClientRect();
+  return r.bottom > 60 && r.top < innerHeight - 60;
+}
+
+setInterval(() => {
+  if (reduzir || !$('#pagina').classList.contains('on')) return;
+  let k = 0;
+  document.querySelectorAll('.pol').forEach(el => {
+    const espia = el.closest('.espia');
+    if (espia && !espia.classList.contains('fora')) return;
+    if (!naTela(el)) return;
+    if (Date.now() - (+el.dataset.manual || 0) < RESPEITO_MS) return;
+    setTimeout(() => el.classList.toggle('virada'), (k++ % 6) * 240);  // escalonado
+  });
+}, AUTO_MS);
+</script>
+</body>
+</html>
